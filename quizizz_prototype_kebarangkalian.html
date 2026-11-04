@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Misi Kebarangkalian — Kuiz Interaktif</title>
+<style>
+:root{--navy:#172554;--blue:#4f46e5;--cyan:#06b6d4;--gold:#f59e0b;--green:#15803d;--red:#b91c1c;--bg:#f4f7ff;--card:#fff}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:linear-gradient(140deg,#e0e7ff,#ecfeff);color:#172554}
+.wrap{max-width:850px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:1.1rem}.pill{background:#e0e7ff;border-radius:99px;padding:8px 13px;font-weight:700}
+.card{background:var(--card);border-radius:24px;padding:clamp(18px,4vw,32px);box-shadow:0 12px 35px #17255418;margin-top:20px}
+h1{font-size:clamp(1.6rem,4vw,2.6rem);margin:.2em 0;color:var(--navy)}h2{margin-top:0}
+.sub{color:#475569;line-height:1.6}.hero{display:grid;grid-template-columns:1fr 160px;gap:15px;align-items:center}
+svg{max-width:100%;height:auto}.btn{border:0;border-radius:14px;padding:13px 18px;font-size:1rem;font-weight:800;cursor:pointer;background:var(--blue);color:white}.btn.secondary{background:#e2e8f0;color:#172554}.btn:disabled{opacity:.5;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.progress{height:12px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin:18px 0}.bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .3s}
+.qmeta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-weight:800;color:#64748b}
+.question{font-size:clamp(1.2rem,2.7vw,1.65rem);font-weight:850;line-height:1.35;margin:20px 0}
+.visual{background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:12px;text-align:center;margin:12px 0}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0}
+.answer{border:2px solid #c7d2fe;border-radius:16px;background:#fff;padding:15px;text-align:left;font-size:1rem;font-weight:750;cursor:pointer;color:#172554}
+.answer:hover{background:#eef2ff;border-color:var(--blue)}.answer.correct{background:#dcfce7;border-color:#16a34a}.answer.wrong{background:#fee2e2;border-color:#dc2626}
+.feedback{padding:14px;border-radius:14px;background:#f1f5f9;line-height:1.5;margin-top:14px}.feedback.good{background:#dcfce7}.feedback.bad{background:#fff7ed}
+.small{font-size:.92rem;color:#64748b}.stars{font-size:1.3rem;letter-spacing:3px;color:#f59e0b}
+@media(max-width:600px){.hero{grid-template-columns:1fr}.hero svg{max-width:125px;margin:auto}.answers{grid-template-columns:1fr}.wrap{padding:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <div class="top"><div class="logo">🎯 MISI MATEMATIK · TINGKATAN 2</div><div class="pill">⭐ <span id="pointsTop">0</span> mata</div></div>
+ <section class="card" id="start">
+  <div class="hero">
+   <div><div class="pill">CABARAN 1 · KEBARANGKALIAN MUDAH</div><h1>Jom jadi Detektif Kebarangkalian!</h1>
+   <p class="sub">Selesaikan 8 misi. Baca, fikir dan pilih jawapan. Setiap jawapan akan disertai maklum balas supaya kamu boleh belajar daripada kesilapan.</p>
+   <p>🏅 Ketepatan • 💡 Maklum balas segera • 🚀 Kemajuan sendiri</p></div>
+   <svg viewBox="0 0 160 150" role="img" aria-label="Dadu dan syiling"><rect x="18" y="22" width="76" height="76" rx="17" fill="#6366f1" transform="rotate(-12 56 60)"/><g fill="#fff"><circle cx="40" cy="43" r="6"/><circle cx="70" cy="65" r="6"/><circle cx="42" cy="83" r="6"/></g><circle cx="112" cy="95" r="39" fill="#fbbf24" stroke="#d97706" stroke-width="5"/><text x="112" y="108" font-size="36" text-anchor="middle" fill="#92400e" font-weight="900">?</text><path d="M98 18l8 15 17 2-13 11 3 17-15-8-15 8 3-17-13-11 17-2z" fill="#06b6d4"/></svg>
+  </div>
+  <div class="row"><button class="btn" onclick="begin()">Mula Misi ▶</button><span class="small">Anggaran masa: 8–10 minit</span></div>
+ </section>
+ <section class="card" id="game" hidden>
+  <div class="qmeta"><span id="mission">Misi 1/8</span><span>⭐ <span id="score">0</span> mata</span></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="visual" class="visual" hidden></div>
+  <div class="question" id="question"></div>
+  <div class="answers" id="answers"></div>
+  <div id="feedback" class="feedback" hidden aria-live="polite"></div>
+  <div class="row"><button class="btn" id="next" onclick="nextQ()" disabled>Soalan seterusnya →</button></div>
+ </section>
+ <section class="card" id="finish" hidden>
+  <div class="pill">🏁 MISI SELESAI</div><h1 id="finalTitle">Syabas!</h1>
+  <div class="stars" id="stars"></div><h2>Skor: <span id="finalScore"></span>/800</h2>
+  <p id="summary" class="sub"></p>
+  <div class="feedback" id="reflection"></div>
+  <div class="row"><button class="btn" onclick="restart()">Cuba lagi ↻</button><button class="btn secondary" onclick="window.print()">Cetak keputusan</button></div>
+ </section>
+ <p class="small" style="text-align:center;margin:20px">Prototaip pembelajaran • Kebarangkalian Mudah • Matematik Tingkatan 2</p>
+</div>
+<script>
+const qs=[
+ {q:"Sebuah syiling yang adil dilambung sekali. Apakah kebarangkalian mendapat gambar?",v:"visual coin",a:["0","1/2","1/3","1"],c:1,e:"Syiling mempunyai 2 hasil sama mungkin: gambar atau angka. Maka P(gambar)=1/2."},
+ {q:"Sebuah dadu adil mempunyai nombor 1 hingga 6. Apakah ruang sampelnya?",v:"visual dice",a:["{1, 2, 3}","{0, 1, 2, 3, 4, 5}","{1, 2, 3, 4, 5, 6}","{2, 4, 6}"],c:2,e:"Ruang sampel ialah set semua hasil yang mungkin. Bagi dadu ini, hasilnya 1, 2, 3, 4, 5 dan 6."},
+ {q:"Dadu dilambung sekali. A ialah peristiwa mendapat nombor genap. Berapakah n(A)?",v:"visual dice",a:["1","2","3","6"],c:2,e:"Nombor genap ialah 2, 4 dan 6. Jadi terdapat 3 hasil yang memihak kepada A."},
+ {q:"Kad bernombor 1 hingga 10 dipilih secara rawak. Apakah P(mendapat nombor lebih besar daripada 7)?",v:"visual cards",a:["2/10","3/10","7/10","1/10"],c:1,e:"Nombor yang lebih besar daripada 7 ialah 8, 9 dan 10. Terdapat 3 hasil daripada 10 hasil yang mungkin, maka kebarangkalian ialah 3/10."},
+ {q:"Satu beg mengandungi 3 bola merah dan 2 bola biru. Sebiji bola dipilih tanpa melihat. Apakah P(biru)?",v:"visual balls",a:["3/5","2/5","1/2","2/3"],c:1,e:"Jumlah bola ialah 5 dan bola biru ada 2. P(biru)=2/5."},
+ {q:"P(A)=0. Apakah maksudnya?",v:"",a:["Peristiwa A pasti berlaku","Peristiwa A mustahil berlaku","A berlaku separuh masa","A mempunyai 1 hasil"],c:1,e:"Kebarangkalian 0 menunjukkan peristiwa mustahil berlaku."},
+ {q:"Satu roda mempunyai 4 sektor sama besar: merah, kuning, hijau dan biru. Apakah P(roda berhenti pada hijau)?",v:"visual spinner",a:["1/4","1/2","3/4","1"],c:0,e:"Empat sektor sama besar, dan hanya satu sektor hijau. Maka P(hijau)=1/4."},
+ {q:"Dalam satu eksperimen, terdapat 5 hasil sama mungkin. Peristiwa B mempunyai 2 hasil yang memihak. Apakah P(B)?",v:"",a:["5/2","2/5","1/5","3/5"],c:1,e:"Gunakan rumus P(B)=n(B)/n(S)=2/5."}
+];
+let i=0,score=0,correct=0,locked=false;
+function visual(type){
+ if(type==="visual coin")return '<svg viewBox="0 0 240 100" width="220"><circle cx="120" cy="50" r="42" fill="#fbbf24" stroke="#d97706" stroke-width="5"/><text x="120" y="63" text-anchor="middle" font-size="38" font-weight="900" fill="#92400e">G</text><text x="120" y="98" text-anchor="middle" font-size="12" fill="#64748b">SYILING: Gambar (G) / Angka (A)</text></svg>';
+ if(type==="visual dice")return '<svg viewBox="0 0 240 100" width="220"><rect x="76" y="8" width="88" height="84" rx="13" fill="#818cf8" stroke="#4f46e5" stroke-width="3"/><g fill="white"><circle cx="96" cy="28" r="6"/><circle cx="144" cy="28" r="6"/><circle cx="120" cy="50" r="6"/><circle cx="96" cy="72" r="6"/><circle cx="144" cy="72" r="6"/></g><text x="120" y="99" text-anchor="middle" font-size="12" fill="#64748b">Dadu: 1 hingga 6</text></svg>';
+ if(type==="visual cards")return '<svg viewBox="0 0 240 105" width="220"><g font-size="25" font-weight="800" text-anchor="middle"><rect x="20" y="10" width="44" height="62" rx="7" fill="#fff" stroke="#cbd5e1"/><text x="42" y="49" fill="#4f46e5">7</text><rect x="72" y="10" width="44" height="62" rx="7" fill="#fff" stroke="#cbd5e1"/><text x="94" y="49" fill="#4f46e5">8</text><rect x="124" y="10" width="44" height="62" rx="7" fill="#fff" stroke="#cbd5e1"/><text x="146" y="49" fill="#4f46e5">9</text><rect x="176" y="10" width="44" height="62" rx="7" fill="#fff" stroke="#cbd5e1"/><text x="198" y="49" fill="#4f46e5">10</text></g><text x="120" y="94" text-anchor="middle" font-size="12" fill="#64748b">Kad bernombor 1–10</text></svg>';
+ if(type==="visual balls")return '<svg viewBox="0 0 240 110" width="220"><g stroke="#fff" stroke-width="2"><circle cx="65" cy="36" r="22" fill="#ef4444"/><circle cx="112" cy="36" r="22" fill="#ef4444"/><circle cx="159" cy="36" r="22" fill="#ef4444"/><circle cx="88" cy="80" r="22" fill="#3b82f6"/><circle cx="136" cy="80" r="22" fill="#3b82f6"/></g><text x="120" y="107" text-anchor="middle" font-size="12" fill="#64748b">3 merah + 2 biru</text></svg>';
+ if(type==="visual spinner")return '<svg viewBox="0 0 240 115" width="220"><circle cx="120" cy="55" r="48" fill="#fff" stroke="#334155" stroke-width="3"/><path d="M120 55 L120 7 A48 48 0 0 1 168 55Z" fill="#22c55e"/><path d="M120 55 L168 55 A48 48 0 0 1 120 103Z" fill="#3b82f6"/><path d="M120 55 L120 103 A48 48 0 0 1 72 55Z" fill="#ef4444"/><path d="M120 55 L72 55 A48 48 0 0 1 120 7Z" fill="#facc15"/><circle cx="120" cy="55" r="5" fill="#172554"/><text x="120" y="113" text-anchor="middle" font-size="12" fill="#64748b">4 sektor sama besar</text></svg>';
+ return "";
+}
+function begin(){document.getElementById("start").hidden=true;document.getElementById("game").hidden=false;render()}
+function render(){
+ locked=false;let q=qs[i];
+ document.getElementById("mission").textContent=`Misi ${i+1}/${qs.length}`;
+ document.getElementById("score").textContent=score;
+ document.getElementById("bar").style.width=(i/qs.length*100)+"%";
+ document.getElementById("question").textContent=q.q;
+ let v=document.getElementById("visual");v.innerHTML=visual(q.v);v.hidden=!q.v;
+ let a=document.getElementById("answers");a.innerHTML="";
+ q.a.forEach((t,j)=>{let b=document.createElement("button");b.className="answer";b.textContent=String.fromCharCode(65+j)+". "+t;b.onclick=()=>choose(j);a.appendChild(b)});
+ let f=document.getElementById("feedback");f.hidden=true;f.className="feedback";
+ document.getElementById("next").disabled=true;document.getElementById("next").textContent=i===qs.length-1?"Lihat keputusan 🏁":"Soalan seterusnya →";
+}
+function choose(j){
+ if(locked)return;locked=true;let q=qs[i],ok=j===q.c;
+ if(ok){score+=100;correct++}
+ document.getElementById("score").textContent=score;document.getElementById("pointsTop").textContent=score;
+ [...document.querySelectorAll(".answer")].forEach((b,k)=>{b.disabled=true;if(k===q.c)b.classList.add("correct");else if(k===j)b.classList.add("wrong")});
+ let f=document.getElementById("feedback");f.hidden=false;f.className="feedback "+(ok?"good":"bad");
+ f.innerHTML=(ok?"✅ <b>Tepat! +100 mata.</b> ":"💡 <b>Belum tepat.</b> Jawapan yang betul ialah <b>"+q.a[q.c]+"</b>. ")+q.e;
+ document.getElementById("next").disabled=false;
+}
+function nextQ(){if(!locked)return;i++;if(i<qs.length)render();else finish()}
+function finish(){
+ document.getElementById("game").hidden=true;document.getElementById("finish").hidden=false;
+ document.getElementById("bar").style.width="100%";document.getElementById("finalScore").textContent=score;
+ let pct=correct/qs.length;document.getElementById("stars").textContent=pct>=.875?"⭐⭐⭐":pct>=.625?"⭐⭐":"⭐";
+ document.getElementById("finalTitle").textContent=pct>=.875?"Hebat, Detektif!":pct>=.625?"Syabas! Terus berlatih!":"Usaha yang baik! Cuba lagi!";
+ document.getElementById("summary").textContent=`Anda menjawab ${correct} daripada ${qs.length} soalan dengan betul.`;
+ document.getElementById("reflection").innerHTML="<b>Refleksi:</b> Konsep manakah yang sudah anda kuasai? Soalan manakah yang ingin anda cuba semula? Ingat, kesilapan ialah peluang untuk belajar.";
+}
+function restart(){i=0;score=0;correct=0;document.getElementById("pointsTop").textContent=0;document.getElementById("finish").hidden=true;document.getElementById("start").hidden=false}
+</script>
+</body></html>
